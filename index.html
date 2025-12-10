@@ -192,7 +192,11 @@
         </div>
     </div>
 
-    <script src="data.js"></script>
+    <!-- 加上 ?v=时间戳，浏览器就会认为这是个新文件，必须重新下载 -->
+<script>
+    document.write('<script src="data.js?v=' + new Date().getTime() + '"><\/script>');
+</script>
+
     <script>
         let d = window.portfolioData;
         let curLang = 'zh';
