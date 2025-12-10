@@ -3,47 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>全能内容管理后台 (i18n版)</title>
+    <title>全能内容管理后台 (Pro v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .tab-active { background-color: #2563eb; color: white; border-color: #2563eb; }
-        .tab-inactive { background-color: #f9fafb; color: #4b5563; hover:bg-gray-100; }
+        .input-std { width: 100%; border: 1px solid #e5e7eb; padding: 0.5rem; border-radius: 0.375rem; outline: none; font-size: 0.875rem; transition: all 0.2s; }
+        .input-std:focus { border-color: #3b82f6; ring: 2px; }
+        .label-tiny { font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 0.25rem; display: block; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6">
     <div class="max-w-[1400px] mx-auto bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col h-[90vh]">
-        
         <!-- 头部 -->
         <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-            <h1 class="text-lg font-bold"><i class="fa-solid fa-globe mr-2"></i>Admin Pro (i18n)</h1>
+            <h1 class="text-lg font-bold"><i class="fa-solid fa-sliders mr-2"></i>Admin Pro v3</h1>
             <div class="flex gap-3">
-                <button onclick="downloadBackup()" class="px-4 py-2 bg-gray-700 rounded text-sm font-bold">备份</button>
-                <button onclick="saveChanges()" class="px-6 py-2 bg-green-600 rounded text-sm font-bold">保存</button>
+                <button onclick="downloadBackup()" class="px-4 py-2 bg-gray-700 rounded text-sm font-bold hover:bg-gray-600">备份</button>
+                <button onclick="saveChanges()" class="px-6 py-2 bg-green-600 rounded text-sm font-bold hover:bg-green-500 shadow-lg">保存</button>
             </div>
         </div>
 
         <!-- 导航 -->
-        <div class="flex border-b overflow-x-auto shrink-0 bg-gray-50">
-            <button onclick="switchTab('info')" id="tab-info" class="tab-btn px-6 py-4 text-sm font-bold border-r">基本信息</button>
-            <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-6 py-4 text-sm font-bold border-r">项目 (双语标签)</button>
-            <button onclick="switchTab('stack')" id="tab-stack" class="tab-btn px-6 py-4 text-sm font-bold border-r">技术栈 (双语)</button>
-            <button onclick="switchTab('opensource')" id="tab-opensource" class="tab-btn px-6 py-4 text-sm font-bold border-r">开源 (双语)</button>
-            <button onclick="switchTab('experience')" id="tab-experience" class="tab-btn px-6 py-4 text-sm font-bold border-r">经历</button>
-            <button onclick="switchTab('socials')" id="tab-socials" class="tab-btn px-6 py-4 text-sm font-bold border-r">社交链接</button>
+        <div class="flex border-b overflow-x-auto shrink-0 bg-gray-50 no-scrollbar">
+            <button onclick="switchTab('info')" id="tab-info" class="tab-btn px-6 py-4 text-sm font-bold border-r border-b-2 border-b-blue-600 bg-white text-blue-600">基本信息</button>
+            <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100">项目</button>
+            <button onclick="switchTab('experience')" id="tab-experience" class="tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100">经历</button>
+            <button onclick="switchTab('opensource')" id="tab-opensource" class="tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100">开源</button>
+            <button onclick="switchTab('stack')" id="tab-stack" class="tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100">技术栈</button>
+            <button onclick="switchTab('socials')" id="tab-socials" class="tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100">社交链接</button>
         </div>
 
-        <!-- 内容 -->
+        <!-- 内容区域 -->
         <div class="flex-1 overflow-hidden relative bg-white">
             
             <!-- Info -->
-            <div id="view-info" class="view-section h-full overflow-y-auto p-8 hidden">
+            <div id="view-info" class="view-section h-full overflow-y-auto p-8">
                 <div class="max-w-4xl mx-auto space-y-6">
                     <div class="grid grid-cols-2 gap-6">
                         <div><label class="label-tiny">显示名称</label><input class="input-std" id="info-name" oninput="data.info.name=this.value"></div>
                         <div><label class="label-tiny">Email</label><input class="input-std" id="info-email" oninput="data.info.email=this.value"></div>
                     </div>
-                    <div><label class="label-tiny">头像路径</label><input class="input-std bg-gray-50" id="info-avatar" oninput="data.info.avatar=this.value; document.getElementById('preview-avt').src=this.value"></div>
+                    <div><label class="label-tiny">头像路径 (./images/xx.jpg)</label><input class="input-std bg-gray-50" id="info-avatar" oninput="data.info.avatar=this.value; document.getElementById('preview-avt').src=this.value"></div>
                     <div class="grid grid-cols-2 gap-6">
                         <div><label class="label-tiny">中文头衔</label><input class="input-std" id="info-titleZH" oninput="data.info.titleZH=this.value"></div>
                         <div><label class="label-tiny">英文头衔</label><input class="input-std" id="info-titleEN" oninput="data.info.titleEN=this.value"></div>
@@ -52,14 +54,14 @@
                         <div><label class="label-tiny">中文简介</label><textarea class="input-std" rows="3" id="info-descZH" oninput="data.info.descZH=this.value"></textarea></div>
                         <div><label class="label-tiny">英文简介</label><textarea class="input-std" rows="3" id="info-descEN" oninput="data.info.descEN=this.value"></textarea></div>
                     </div>
-                    <img id="preview-avt" src="" class="w-16 h-16 rounded-full border">
+                    <img id="preview-avt" src="" class="w-16 h-16 rounded-full border object-cover">
                 </div>
             </div>
 
-            <!-- Projects (Updated for Dual Tags) -->
+            <!-- Projects -->
             <div id="view-projects" class="view-section h-full flex hidden">
-                <div class="w-64 border-r bg-gray-50 flex flex-col">
-                    <div class="p-4 border-b"><button onclick="addProject()" class="w-full py-2 bg-blue-600 text-white text-sm font-bold rounded">+ 新建项目</button></div>
+                <div class="w-72 border-r bg-gray-50 flex flex-col">
+                    <div class="p-4 border-b"><button onclick="addProject()" class="w-full py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700 shadow">+ 新建项目</button></div>
                     <div id="list-projects" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-8" id="form-projects">
@@ -67,34 +69,34 @@
                 </div>
             </div>
 
-            <!-- Stack (Updated for Dual Category) -->
-            <div id="view-stack" class="view-section h-full p-8 overflow-y-auto hidden">
+            <!-- Experience (Updated for Dual Time) -->
+            <div id="view-experience" class="view-section h-full p-8 overflow-y-auto hidden">
                 <div class="max-w-4xl mx-auto">
-                    <button onclick="addStackCat()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6">+ 新增分类</button>
-                    <div id="list-stack" class="space-y-6"></div>
+                    <button onclick="addExperience()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6 hover:bg-blue-200">+ 新增经历</button>
+                    <div id="list-experience" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- OpenSource (Updated for Dual Desc/Role) -->
+            <!-- OpenSource -->
             <div id="view-opensource" class="view-section h-full p-8 overflow-y-auto hidden">
                 <div class="max-w-5xl mx-auto">
-                    <button onclick="addOpenSource()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6">+ 新增记录</button>
+                    <button onclick="addOpenSource()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6 hover:bg-blue-200">+ 新增记录</button>
                     <div id="list-opensource" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </div>
 
-            <!-- Experience -->
-            <div id="view-experience" class="view-section h-full p-8 overflow-y-auto hidden">
+            <!-- Stack -->
+            <div id="view-stack" class="view-section h-full p-8 overflow-y-auto hidden">
                 <div class="max-w-4xl mx-auto">
-                    <button onclick="addExperience()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6">+ 新增经历</button>
-                    <div id="list-experience" class="space-y-4"></div>
+                    <button onclick="addStackCat()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6 hover:bg-blue-200">+ 新增分类</button>
+                    <div id="list-stack" class="space-y-6"></div>
                 </div>
             </div>
 
             <!-- Socials -->
             <div id="view-socials" class="view-section h-full p-8 overflow-y-auto hidden">
                 <div class="max-w-5xl mx-auto">
-                    <button onclick="addSocial()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6">+ 新增链接</button>
+                    <button onclick="addSocial()" class="px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded text-sm mb-6 hover:bg-blue-200">+ 新增链接</button>
                     <div id="list-socials" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
@@ -108,6 +110,18 @@
         let projectEditIndex = -1;
         let fileHandle = null;
 
+        const iconMap = {
+            "fa-brands fa-github": "GitHub",
+            "fa-solid fa-envelope": "Email (邮箱)",
+            "fa-brands fa-zhihu": "知乎 (Zhihu)",
+            "fa-brands fa-bilibili": "Bilibili",
+            "fa-brands fa-twitter": "Twitter / X",
+            "fa-brands fa-linkedin": "LinkedIn",
+            "fa-solid fa-camera-retro": "小红书 (相机)",
+            "fa-brands fa-weixin": "微信 (WeChat)",
+            "fa-solid fa-link": "其他链接"
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('info');
             ['name', 'email', 'avatar', 'titleZH', 'titleEN', 'descZH', 'descEN'].forEach(key => {
@@ -119,19 +133,32 @@
         function switchTab(tab) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = btn.id === `tab-${tab}` ? "tab-btn px-6 py-4 text-sm font-bold border-r bg-white text-blue-600 border-b-2 border-b-blue-600" : "tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-50");
-            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.id === `tab-${tab}`) {
+                    btn.className = "tab-btn px-6 py-4 text-sm font-bold border-r border-b-2 border-b-blue-600 bg-white text-blue-600 transition";
+                } else {
+                    btn.className = "tab-btn px-6 py-4 text-sm font-bold border-r text-gray-500 hover:bg-gray-100 transition";
+                }
+            });
             if(tab === 'projects') renderProjectList();
+            if(tab === 'experience') renderExperience();
             if(tab === 'stack') renderStack();
             if(tab === 'opensource') renderOpenSource();
-            if(tab === 'experience') renderExperience();
             if(tab === 'socials') renderSocials();
         }
 
         // Projects
         function renderProjectList() {
             document.getElementById('list-projects').innerHTML = data.projects.map((p, idx) => `
-                <div onclick="editProject(${idx})" class="p-3 rounded cursor-pointer truncate mb-1 hover:bg-blue-50 ${projectEditIndex===idx ? 'bg-blue-100 font-bold text-blue-700' : ''}">${p.titleZH || '未命名'}</div>
+                <div class="flex items-center gap-1 mb-1 group">
+                    <div class="flex flex-col gap-0.5 opacity-30 group-hover:opacity-100 transition">
+                        <button onclick="moveItem('projects', ${idx}, -1); event.stopPropagation()" class="text-[10px] hover:text-blue-600 px-1">▲</button>
+                        <button onclick="moveItem('projects', ${idx}, 1); event.stopPropagation()" class="text-[10px] hover:text-blue-600 px-1">▼</button>
+                    </div>
+                    <div onclick="editProject(${idx})" class="flex-1 p-3 rounded cursor-pointer truncate border hover:bg-blue-50 ${projectEditIndex===idx ? 'bg-blue-100 font-bold text-blue-700' : 'bg-white'}">
+                        ${p.titleZH || '未命名'}
+                    </div>
+                </div>
             `).join('');
         }
         function editProject(idx) {
@@ -146,8 +173,8 @@
                         <div><label class="label-tiny">英文标题</label><input class="input-std" value="${p.titleEN||''}" oninput="data.projects[${idx}].titleEN=this.value"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="label-tiny">中文标签 (逗号分隔)</label><input class="input-std" value="${(p.tagsZH||[]).join(',')}" onchange="data.projects[${idx}].tagsZH=this.value.split(/[,，]/)"></div>
-                        <div><label class="label-tiny">英文标签 (逗号分隔)</label><input class="input-std" value="${(p.tagsEN||[]).join(',')}" onchange="data.projects[${idx}].tagsEN=this.value.split(/[,，]/)"></div>
+                        <div><label class="label-tiny">中文标签</label><input class="input-std" value="${(p.tagsZH||[]).join(',')}" onchange="data.projects[${idx}].tagsZH=this.value.split(/[,，]/)"></div>
+                        <div><label class="label-tiny">英文标签</label><input class="input-std" value="${(p.tagsEN||[]).join(',')}" onchange="data.projects[${idx}].tagsEN=this.value.split(/[,，]/)"></div>
                     </div>
                     <div><label class="label-tiny">分类</label><input class="input-std" value="${p.category||''}" oninput="data.projects[${idx}].category=this.value"></div>
                     <div><label class="label-tiny">封面图</label><input class="input-std bg-gray-50" value="${p.image||''}" oninput="data.projects[${idx}].image=this.value"></div>
@@ -164,91 +191,92 @@
         }
         function addProject() { data.projects.push({id:Date.now(), titleZH:"新项目", tagsZH:[], tagsEN:[]}); renderProjectList(); editProject(data.projects.length-1); }
 
-        // Stack
-        function renderStack() {
-            document.getElementById('list-stack').innerHTML = data.stack.map((cat, idx) => `
-                <div class="border rounded p-4 bg-gray-50 relative">
-                    <button onclick="data.stack.splice(${idx},1);renderStack()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-trash"></i></button>
-                    <div class="grid grid-cols-2 gap-4 mb-2">
-                        <div><label class="label-tiny">中文分类</label><input class="input-std" value="${cat.categoryZH||''}" oninput="data.stack[${idx}].categoryZH=this.value"></div>
-                        <div><label class="label-tiny">英文分类</label><input class="input-std" value="${cat.categoryEN||''}" oninput="data.stack[${idx}].categoryEN=this.value"></div>
-                    </div>
-                    <div><label class="label-tiny">技术项</label><textarea class="input-std" onchange="data.stack[${idx}].items=this.value.split(/[,，]/).map(s=>s.trim())">${cat.items.join(', ')}</textarea></div>
-                </div>`).join('');
-        }
-        function addStackCat() { data.stack.push({categoryZH:"新分类", categoryEN:"New Cat", items:[]}); renderStack(); }
-
-        // OpenSource
-        function renderOpenSource() {
-            document.getElementById('list-opensource').innerHTML = data.opensource.map((item, idx) => `
-                <div class="border rounded p-4 bg-gray-50 relative">
-                    <button onclick="data.opensource.splice(${idx},1);renderOpenSource()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-times"></i></button>
-                    <div class="mb-2"><label class="label-tiny">仓库名</label><input class="input-std font-bold" value="${item.repo}" oninput="data.opensource[${idx}].repo=this.value"></div>
-                    <div class="grid grid-cols-2 gap-4 mb-2">
-                        <div><label class="label-tiny">中文描述</label><input class="input-std" value="${item.descZH||''}" oninput="data.opensource[${idx}].descZH=this.value"></div>
-                        <div><label class="label-tiny">英文描述</label><input class="input-std" value="${item.descEN||''}" oninput="data.opensource[${idx}].descEN=this.value"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-2">
-                        <div><label class="label-tiny">中文角色</label><input class="input-std" value="${item.roleZH||''}" oninput="data.opensource[${idx}].roleZH=this.value"></div>
-                        <div><label class="label-tiny">英文角色</label><input class="input-std" value="${item.roleEN||''}" oninput="data.opensource[${idx}].roleEN=this.value"></div>
-                    </div>
-                    <div><label class="label-tiny">链接</label><input class="input-std text-blue-600" value="${item.link}" oninput="data.opensource[${idx}].link=this.value"></div>
-                </div>`).join('');
-        }
-        function addOpenSource() { data.opensource.push({repo:"", descZH:"", descEN:"", roleZH:"", roleEN:"", link:""}); renderOpenSource(); }
-
-        // Experience & Socials (Reuse previous logic)
+        // Experience (Supports timeZH/timeEN)
         function renderExperience() {
             document.getElementById('list-experience').innerHTML = data.experience.map((e, idx) => `
-                <div class="border rounded p-4 bg-gray-50 relative">
-                    <button onclick="data.experience.splice(${idx},1);renderExperience()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-trash"></i></button>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <input placeholder="中文职位" class="input-std font-bold" value="${e.roleZH||''}" oninput="data.experience[${idx}].roleZH=this.value">
-                        <input placeholder="英文职位" class="input-std font-bold" value="${e.roleEN||''}" oninput="data.experience[${idx}].roleEN=this.value">
+                <div class="border rounded p-4 bg-gray-50 relative flex gap-4 group hover:shadow-md transition">
+                    <div class="flex flex-col gap-1 pt-1 opacity-30 group-hover:opacity-100 transition">
+                        <button onclick="moveItem('experience', ${idx}, -1)" class="text-xs hover:text-blue-600 bg-white border p-1 rounded">▲</button>
+                        <button onclick="moveItem('experience', ${idx}, 1)" class="text-xs hover:text-blue-600 bg-white border p-1 rounded">▼</button>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <input placeholder="公司(中)" class="input-std" value="${e.companyZH||''}" oninput="data.experience[${idx}].companyZH=this.value">
-                        <input placeholder="公司(英)" class="input-std" value="${e.companyEN||''}" oninput="data.experience[${idx}].companyEN=this.value">
-                    </div>
-                    <input placeholder="时间" class="input-std mb-2" value="${e.time||''}" oninput="data.experience[${idx}].time=this.value">
-                    <div class="grid grid-cols-2 gap-2">
-                        <textarea placeholder="描述(中)" class="input-std" oninput="data.experience[${idx}].descZH=this.value">${e.descZH||''}</textarea>
-                        <textarea placeholder="描述(英)" class="input-std" oninput="data.experience[${idx}].descEN=this.value">${e.descEN||''}</textarea>
+                    <div class="flex-1">
+                        <button onclick="data.experience.splice(${idx},1);renderExperience()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-trash"></i></button>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <input placeholder="中文职位" class="input-std font-bold" value="${e.roleZH||''}" oninput="data.experience[${idx}].roleZH=this.value">
+                            <input placeholder="英文职位" class="input-std font-bold" value="${e.roleEN||''}" oninput="data.experience[${idx}].roleEN=this.value">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <input placeholder="公司(中)" class="input-std" value="${e.companyZH||''}" oninput="data.experience[${idx}].companyZH=this.value">
+                            <input placeholder="公司(英)" class="input-std" value="${e.companyEN||''}" oninput="data.experience[${idx}].companyEN=this.value">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <input placeholder="时间(中) 2025.9-至今" class="input-std" value="${e.timeZH||''}" oninput="data.experience[${idx}].timeZH=this.value">
+                            <input placeholder="时间(英) Sep 2025 - Present" class="input-std" value="${e.timeEN||''}" oninput="data.experience[${idx}].timeEN=this.value">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <textarea placeholder="描述(中)" class="input-std" oninput="data.experience[${idx}].descZH=this.value">${e.descZH||''}</textarea>
+                            <textarea placeholder="描述(英)" class="input-std" oninput="data.experience[${idx}].descEN=this.value">${e.descEN||''}</textarea>
+                        </div>
                     </div>
                 </div>`).join('');
         }
         function addExperience() { data.experience.push({}); renderExperience(); }
 
-        function renderSocials() {
-            document.getElementById('list-socials').innerHTML = data.socials.map((s, idx) => `
-                <div class="border rounded p-3 bg-white shadow-sm relative group flex gap-3">
-                    <button onclick="data.socials.splice(${idx},1);renderSocials()" class="absolute top-1 right-1 text-red-500 opacity-0 group-hover:opacity-100"><i class="fa fa-times"></i></button>
-                    <div class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded text-xl"><i class="${s.icon} text-gray-600"></i></div>
-                    <div class="flex-1 space-y-2">
-                        <input class="input-std text-xs font-bold" placeholder="名称" value="${s.name}" oninput="data.socials[${idx}].name=this.value">
-                        <input class="input-std text-xs font-mono" placeholder="图标类名" value="${s.icon}" oninput="data.socials[${idx}].icon=this.value">
-                        <input class="input-std text-xs text-blue-600" placeholder="URL" value="${s.link}" oninput="data.socials[${idx}].link=this.value">
+        // OpenSource
+        function renderOpenSource() {
+            document.getElementById('list-opensource').innerHTML = data.opensource.map((o,i)=>`
+                <div class="border p-4 mb-2 rounded relative bg-gray-50">
+                    <button onclick="data.opensource.splice(${i},1);renderOpenSource()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-times"></i></button>
+                    <div class="mb-2"><label class="label-tiny">仓库名</label><input class="input-std font-bold" value="${o.repo}" oninput="data.opensource[${i}].repo=this.value"></div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <div><label class="label-tiny">中文描述</label><input class="input-std" value="${o.descZH||''}" oninput="data.opensource[${i}].descZH=this.value"></div>
+                        <div><label class="label-tiny">英文描述</label><input class="input-std" value="${o.descEN||''}" oninput="data.opensource[${i}].descEN=this.value"></div>
                     </div>
-                </div>`).join('');
+                    <div class="flex gap-2 mb-2">
+                        <div><label class="label-tiny">角色(中)</label><input class="input-std text-xs" value="${o.roleZH||''}" oninput="data.opensource[${i}].roleZH=this.value"></div>
+                        <div><label class="label-tiny">角色(英)</label><input class="input-std text-xs" value="${o.roleEN||''}" oninput="data.opensource[${i}].roleEN=this.value"></div>
+                    </div>
+                    <div><label class="label-tiny">链接</label><input class="input-std text-blue-600" value="${o.link||''}" oninput="data.opensource[${i}].link=this.value"></div>
+                </div>`).join(''); 
         }
-        function addSocial() { data.socials.push({name:"New", icon:"fa-solid fa-link", link:""}); renderSocials(); }
+        function addOpenSource(){ data.opensource.push({repo:"",descZH:"",descEN:"",roleZH:"",roleEN:"",link:""}); renderOpenSource(); }
 
-        // Save
+        // Stack & Socials
+        function renderStack() { document.getElementById('list-stack').innerHTML = data.stack.map((c,i)=>`<div class="border p-4 mb-2 rounded relative"><button onclick="data.stack.splice(${i},1);renderStack()" class="absolute top-2 right-2 text-red-500"><i class="fa fa-trash"></i></button><div class="grid grid-cols-2 gap-2 mb-2"><input class="input-std" value="${c.categoryZH}" oninput="data.stack[${i}].categoryZH=this.value"><input class="input-std" value="${c.categoryEN}" oninput="data.stack[${i}].categoryEN=this.value"></div><textarea class="input-std" onchange="data.stack[${i}].items=this.value.split(/[,，]/)">${c.items.join(',')}</textarea></div>`).join(''); }
+        function addStackCat(){ data.stack.push({categoryZH:"新分类",categoryEN:"New",items:[]}); renderStack(); }
+
+        function renderSocials() { document.getElementById('list-socials').innerHTML = data.socials.map((s,i)=>`
+            <div class="border p-3 rounded relative flex gap-3 items-start bg-gray-50">
+                <button onclick="data.socials.splice(${i},1);renderSocials()" class="absolute top-1 right-1 text-red-500"><i class="fa fa-times"></i></button>
+                <div class="w-10 h-10 flex items-center justify-center bg-white border rounded text-xl shrink-0"><i class="${s.icon} text-gray-700"></i></div>
+                <div class="flex-1 space-y-2">
+                    <input class="input-std text-xs font-bold" placeholder="名称" value="${s.name}" oninput="data.socials[${i}].name=this.value">
+                    <div class="flex gap-1">
+                        <input class="input-std text-xs font-mono text-gray-500" id="social-icon-${i}" value="${s.icon}" oninput="data.socials[${i}].icon=this.value; renderSocials()">
+                        <select class="border rounded text-xs w-20" onchange="document.getElementById('social-icon-${i}').value=this.value; data.socials[${i}].icon=this.value; renderSocials()">
+                            <option value="">选图标</option>${Object.entries(iconMap).map(([cls, name]) => `<option value="${cls}">${name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <input class="input-std text-xs text-blue-600" placeholder="URL" value="${s.link}" oninput="data.socials[${i}].link=this.value">
+                </div>
+            </div>`).join(''); 
+        }
+        function addSocial(){ data.socials.push({name:"New",icon:"fa-solid fa-link",link:""}); renderSocials(); }
+
+        function moveItem(key, idx, dir) {
+            const arr = data[key]; const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= arr.length) return;
+            [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+            if (key === 'projects') renderProjectList();
+            if (key === 'experience') renderExperience();
+        }
+
         async function saveChanges() {
             const str = `window.portfolioData = ${JSON.stringify(data, null, 4)};`;
-            try {
-                if ('showSaveFilePicker' in window) {
-                    if (!fileHandle) fileHandle = await window.showSaveFilePicker({ suggestedName: 'data.js' });
-                    const w = await fileHandle.createWritable(); await w.write(str); await w.close(); alert('Saved!');
-                } else { downloadString(str, 'data.js'); }
-            } catch(e) { if(e.name!=='AbortError') downloadString(str, 'data.js'); }
+            try { if('showSaveFilePicker' in window){ if(!fileHandle) fileHandle=await window.showSaveFilePicker({suggestedName:'data.js'}); const w=await fileHandle.createWritable(); await w.write(str); await w.close(); alert('Saved!'); } else { downloadString(str, 'data.js'); } } catch(e){ if(e.name!=='AbortError') downloadString(str,'data.js'); }
         }
         function downloadBackup() { downloadString(`window.portfolioData = ${JSON.stringify(data, null, 4)};`, `backup_${Date.now()}.js`); }
         function downloadString(c, n) { const a = document.getElementById('download-anchor'); a.href = URL.createObjectURL(new Blob([c],{type:'text/javascript'})); a.download = n; a.click(); }
-        
-        // CSS Helper
-        const css = `.label-tiny{font-size:0.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:0.25rem;display:block} .input-std{width:100%;border:1px solid #e5e7eb;padding:0.5rem;border-radius:0.375rem;outline:none;font-size:0.875rem} .input-std:focus{border-color:#3b82f6;ring:2px}`;
-        const s = document.createElement('style'); s.innerHTML=css; document.head.appendChild(s);
     </script>
 </body>
 </html>

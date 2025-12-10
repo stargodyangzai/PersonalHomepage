@@ -10,6 +10,45 @@
     <script>tailwind.config = { darkMode: 'class' };</script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; }
+        
+        /* 1. 量子网格背景 */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(229, 231, 235, 0.5) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(229, 231, 235, 0.5) 1px, transparent 1px);
+        }
+        .dark .bg-grid {
+            background-image: linear-gradient(to right, rgba(55, 65, 81, 0.3) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(55, 65, 81, 0.3) 1px, transparent 1px);
+        }
+
+        /* 2. 聚光灯效果 */
+        .spotlight-card { position: relative; overflow: hidden; }
+        .spotlight-card::before {
+            content: ''; position: absolute;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(59, 130, 246, 0.06), transparent 40%);
+            top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s;
+        }
+        .spotlight-card:hover::before { opacity: 1; }
+        
+        /* 3. 动画 */
+        .cursor-blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #9333ea, #db2777);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% auto; animation: gradientMove 5s linear infinite;
+        }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        .avatar-glow { box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); animation: breathe 3s ease-in-out infinite; }
+        @keyframes breathe { 0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); } 50% { box-shadow: 0 0 30px rgba(147, 51, 234, 0.6); } }
+        
+        .scroll-down { animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+
+        /* Markdown */
         .markdown-body h3 { font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1f2937; }
         .dark .markdown-body h3 { color: #f3f4f6; }
         .markdown-body p { margin-bottom: 1rem; line-height: 1.7; color: #4b5563; }
@@ -17,97 +56,138 @@
         .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
         .markdown-body img { border-radius: 0.5rem; margin: 1.5rem 0; border: 1px solid #e5e7eb; }
         .dark .markdown-body img { border-color: #374151; }
+
+        /* 4. 复制提示 Toast (新增) */
+        .toast-notification {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+            background-color: #1f2937; color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 0.875rem; font-weight: 500;
+            opacity: 0; transition: all 0.3s ease-out; z-index: 100; display: flex; items-center; gap: 0.5rem;
+        }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .dark .toast-notification { background-color: #f3f4f6; color: #1f2937; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300 selection:bg-blue-500 selection:text-white bg-grid">
 
-    <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm z-40 transition-colors">
+    <!-- 导航栏 -->
+    <nav class="fixed w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm z-40 transition-colors border-b border-gray-100 dark:border-slate-800">
         <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
-            <span class="font-bold text-xl" id="nav-name">MyPortfolio</span>
+            <!-- 左侧 -->
+            <div class="flex items-center gap-3">
+                <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200 dark:border-slate-700 object-cover">
+                <span class="font-bold text-xl tracking-tight hover:text-blue-600 transition cursor-pointer" onclick="window.scrollTo(0,0)" id="nav-name">MyPortfolio</span>
+            </div>
+            <!-- 右侧 -->
             <div class="flex items-center gap-6">
-                <div class="hidden md:flex space-x-6 text-sm font-medium">
-                    <a href="#stack" class="hover:text-blue-600 t-text" data-key="nav_stack">技能</a>
-                    <a href="#projects" class="hover:text-blue-600 t-text" data-key="nav_projects">项目</a>
-                    <a href="#opensource" class="hover:text-blue-600 t-text" data-key="nav_opensource">开源</a>
-                    <a href="#experience" class="hover:text-blue-600 t-text" data-key="nav_exp">经历</a>
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#projects" class="hover:text-blue-600 t-text transition relative group" data-key="nav_projects">项目<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span></a>
+                    <a href="#opensource" class="hover:text-blue-600 t-text transition relative group" data-key="nav_opensource">开源<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span></a>
+                    <a href="#experience" class="hover:text-blue-600 t-text transition relative group" data-key="nav_exp">经历<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span></a>
+                    <a href="#stack" class="hover:text-blue-600 t-text transition relative group" data-key="nav_stack">技能<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span></a>
                 </div>
                 <div class="flex items-center gap-3 border-l pl-6 border-gray-200 dark:border-slate-700">
-                    <button onclick="toggleLang()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition text-sm font-bold">
-                        <span id="lang-btn-text">En</span>
-                    </button>
-                    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition">
-                        <i id="theme-icon" class="fa-solid fa-moon"></i>
-                    </button>
+                    <button onclick="toggleLang()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition text-xs font-bold ring-1 ring-gray-200 dark:ring-slate-700"><span id="lang-btn-text">En</span></button>
+                    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition ring-1 ring-gray-200 dark:ring-slate-700"><i id="theme-icon" class="fa-solid fa-moon text-xs"></i></button>
+                    <a href="#contact" class="hidden sm:flex px-5 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded-full transition shadow hover:shadow-lg hover:-translate-y-0.5 items-center gap-2">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                        <span class="t-text" data-key="hero_btn_contact">联系我</span>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <section class="pt-32 pb-20 px-4 text-center">
-        <img id="avatar" src="" class="w-32 h-32 rounded-full mx-auto shadow-lg mb-6 object-cover border-4 border-white dark:border-slate-800">
-        <h1 id="name" class="text-4xl font-bold mb-4"></h1>
-        <p id="title" class="text-xl text-blue-600 dark:text-blue-400 mb-6 font-medium"></p>
-        <p id="desc" class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"></p>
-        <div class="mt-8 flex justify-center gap-4">
-            <a href="#contact" class="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition shadow-lg t-text" data-key="hero_btn_contact">联系我</a>
-            <a id="github-btn" href="" target="_blank" class="px-6 py-2 border border-gray-300 dark:border-slate-700 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition flex items-center">
-                <i class="fa-brands fa-github mr-2"></i> <span class="t-text" data-key="hero_btn_github">GitHub</span>
-            </a>
+    <!-- Hero -->
+    <section class="min-h-screen flex flex-col justify-center items-center px-4 relative pt-16">
+        <div class="relative mb-8 group">
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
+            <img id="avatar" src="" class="avatar-glow relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white dark:border-slate-800 z-10">
+        </div>
+        <div class="mb-4 text-center">
+            <span id="hero-hello" class="text-xl md:text-2xl text-gray-500 dark:text-gray-400 font-medium mr-2">你好，我是</span>
+            <h1 id="name" class="inline-block text-5xl md:text-7xl font-black tracking-tight gradient-text pb-2"></h1>
+        </div>
+        <p class="text-xl md:text-2xl text-blue-600 dark:text-blue-400 mb-6 font-medium tracking-wide">
+            <span id="title"></span><span class="cursor-blink text-blue-600 dark:text-blue-400 font-light">|</span>
+        </p>
+        <p id="desc" class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed text-lg text-center mb-10"></p>
+        
+        <!-- 社交图标栏 (JS处理点击) -->
+        <div id="hero-socials" class="flex flex-wrap justify-center gap-6 md:gap-8"></div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-gray-400 dark:text-gray-600 scroll-down cursor-pointer" onclick="document.getElementById('projects').scrollIntoView()">
+            <i class="fa-solid fa-chevron-down text-2xl"></i>
         </div>
     </section>
 
-    <!-- 1. 技术栈 -->
-    <section id="stack" class="py-16 bg-white dark:bg-slate-800 transition-colors">
+    <!-- 1. 项目 -->
+    <section id="projects" class="py-24 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm transition-colors border-y border-gray-100 dark:border-slate-800">
         <div class="max-w-6xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_stack">技术栈</h2>
-            <div id="stack-grid" class="grid md:grid-cols-3 gap-8"></div>
-        </div>
-    </section>
-
-    <!-- 2. 项目 -->
-    <section id="projects" class="py-16 bg-gray-50 dark:bg-slate-900 transition-colors">
-        <div class="max-w-6xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_projects">个人项目</h2>
+            <div class="flex items-center justify-center mb-16 gap-4">
+                <div class="h-px w-10 bg-gray-300 dark:bg-slate-600"></div>
+                <h2 class="text-3xl font-bold t-text tracking-wider" data-key="section_projects">个人项目</h2>
+                <div class="h-px w-10 bg-gray-300 dark:bg-slate-600"></div>
+            </div>
             <div id="project-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
         </div>
     </section>
 
-    <!-- 3. 开源 -->
-    <section id="opensource" class="py-16 bg-white dark:bg-slate-800 transition-colors">
+    <!-- 2. 开源 -->
+    <section id="opensource" class="py-24 transition-colors">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_opensource">开源贡献</h2>
+            <h2 class="text-3xl font-bold mb-16 text-center t-text tracking-wider" data-key="section_opensource">开源贡献</h2>
             <div id="os-list" class="grid md:grid-cols-2 gap-6"></div>
         </div>
     </section>
 
-    <!-- 4. 经历 -->
-    <section id="experience" class="py-16 bg-gray-50 dark:bg-slate-900 transition-colors">
+    <!-- 3. 经历 -->
+    <section id="experience" class="py-24 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm transition-colors border-y border-gray-100 dark:border-slate-800">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_exp">工作经历</h2>
-            <div id="exp-list" class="space-y-10 border-l-2 border-gray-200 dark:border-slate-700 ml-4 pl-8 relative"></div>
+            <h2 class="text-3xl font-bold mb-16 text-center t-text tracking-wider" data-key="section_exp">工作经历</h2>
+            <div class="relative pl-10">
+                <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-slate-700"></div>
+                <div id="exp-list" class="space-y-12"></div>
+            </div>
         </div>
     </section>
 
-    <!-- 5. 社交 -->
-    <footer id="contact" class="py-20 bg-gray-900 text-white text-center">
+    <!-- 4. 技术栈 -->
+    <section id="stack" class="py-24 transition-colors">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-16 text-center t-text tracking-wider" data-key="section_stack">技术栈</h2>
+            <div id="stack-grid" class="grid md:grid-cols-3 gap-8"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="py-20 bg-slate-900 text-white text-center">
         <div class="max-w-4xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-8 t-text" data-key="section_contact">保持联系</h2>
-            <div id="social-grid" class="flex flex-wrap justify-center gap-6 mb-12"></div>
+            <div id="social-grid" class="flex flex-wrap justify-center gap-8 mb-12"></div>
             <div class="text-sm text-gray-500 border-t border-gray-800 pt-8">
                 © <span id="year"></span> <span id="footer-name"></span>. <span class="t-text" data-key="footer_rights">All Rights Reserved</span>.
             </div>
         </div>
     </footer>
 
-    <!-- 抽屉 -->
-    <div id="drawer-overlay" onclick="closeDrawer()" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm"></div>
+    <!-- 复制成功提示框 (Toast) -->
+    <div id="toast" class="toast-notification">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">已复制到剪贴板</span>
+    </div>
+
+    <!-- Drawer -->
+    <div id="drawer-overlay" onclick="closeDrawer()" class="fixed inset-0 bg-black/60 z-50 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm"></div>
     <div id="drawer" class="fixed top-0 right-0 h-full w-full md:w-[700px] bg-white dark:bg-slate-900 shadow-2xl z-[60] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
-        <button onclick="closeDrawer()" class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition text-gray-600 dark:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
-        <div class="p-8 pb-20">
-            <div class="w-full h-64 bg-gray-200 dark:bg-slate-800 rounded-xl mb-6 overflow-hidden"><img id="d-img" src="" class="w-full h-full object-cover"></div>
-            <div class="flex flex-wrap gap-2 mb-4" id="d-tags"></div>
-            <h2 id="d-title" class="text-3xl font-bold mb-2 text-gray-900 dark:text-white"></h2>
-            <a id="d-link" href="#" target="_blank" class="text-blue-600 hover:underline mb-8 inline-flex items-center"><i class="fa-solid fa-link mr-2"></i> <span class="t-text" data-key="project_link">项目链接</span></a>
+        <button onclick="closeDrawer()" class="absolute top-6 right-6 z-10 w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition text-gray-600 dark:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="p-8 md:p-12 pb-20">
+            <div class="w-full h-72 bg-gray-100 dark:bg-slate-800 rounded-2xl mb-8 overflow-hidden shadow-inner"><img id="d-img" src="" class="w-full h-full object-cover"></div>
+            <div class="flex flex-wrap gap-2 mb-6" id="d-tags"></div>
+            <h2 id="d-title" class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white leading-tight"></h2>
+            <a id="d-link" href="#" target="_blank" class="text-blue-600 hover:text-blue-700 font-medium mb-10 inline-flex items-center transition group">
+                <i class="fa-solid fa-link mr-2 group-hover:rotate-45 transition"></i> <span class="t-text" data-key="project_link">项目链接</span>
+            </a>
             <div id="d-detail" class="markdown-body text-gray-700 dark:text-gray-300"></div>
         </div>
     </div>
@@ -119,14 +199,58 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if(!d) return alert('Data missing!');
-            initTheme(); renderAll();
+            initTheme(); renderAll(); initSpotlight();
         });
+
+        // 核心：处理社交链接点击 (复制功能)
+// 核心修复：更智能的点击处理
+        function handleSocialClick(e, link) {
+            // 判断逻辑升级：
+            // 1. 如果是以 mailto: 开头 -> 肯定是邮箱
+            // 2. 如果包含 @ 符号且不包含 http -> 99% 是用户只填了邮箱地址
+            const isEmail = link.startsWith('mailto:') || (link.includes('@') && !link.includes('http'));
+
+            if (isEmail) {
+                e.preventDefault(); // 关键：阻止浏览器跳转或刷新
+                
+                // 清理出纯邮箱地址 (把 mailto: 去掉)
+                const email = link.replace('mailto:', '').trim();
+                
+                navigator.clipboard.writeText(email).then(() => {
+                    showToast(curLang === 'zh' ? `邮箱已复制：${email}` : `Email copied: ${email}`);
+                }).catch(err => {
+                    console.error('Copy failed', err);
+                    alert('复制失败，请手动复制');
+                });
+            }
+            // 如果不是邮箱，什么都不做，让 <a target="_blank"> 自动在新标签页打开网址
+        }
+
+        // 显示 Toast 提示
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // 聚光灯
+        function initSpotlight() {
+            document.addEventListener('mousemove', e => {
+                document.querySelectorAll('.spotlight-card').forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+        }
 
         function renderAll() {
             const isZh = curLang === 'zh';
             const t = d.translations[curLang];
 
-            // 静态文本
             document.querySelectorAll('.t-text').forEach(el => {
                 const key = el.getAttribute('data-key');
                 if(t[key]) el.textContent = t[key];
@@ -134,71 +258,91 @@
 
             // Hero
             document.getElementById('nav-name').innerText = d.info.name;
+            document.getElementById('nav-avatar').src = d.info.avatar;
             document.getElementById('name').innerText = d.info.name;
+            document.getElementById('hero-hello').innerText = t.hero_hello;
             document.getElementById('footer-name').innerText = d.info.name;
             document.getElementById('title').innerText = isZh ? d.info.titleZH : d.info.titleEN;
             document.getElementById('desc').innerText = isZh ? d.info.descZH : d.info.descEN;
             document.getElementById('avatar').src = d.info.avatar;
-            document.getElementById('github-btn').href = d.info.github;
             document.getElementById('year').innerText = new Date().getFullYear();
 
-            // Stack (Update: Support categoryZH/EN)
+            // Hero Socials (增加点击事件)
+            document.getElementById('hero-socials').innerHTML = d.socials.map(s => `
+                <a href="${s.link}" target="_blank" onclick="handleSocialClick(event, '${s.link}')" class="text-2xl text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition hover:scale-110 transform duration-200" title="${s.name}"><i class="${s.icon}"></i></a>
+            `).join('');
+
+            // Stack
             document.getElementById('stack-grid').innerHTML = d.stack.map(s => `
-                <div class="p-6 bg-gray-50 dark:bg-slate-700 rounded-xl">
-                    <h3 class="font-bold text-lg mb-4 text-blue-600 dark:text-blue-400 border-b pb-2 border-gray-200 dark:border-slate-600">
-                        ${isZh ? s.categoryZH : s.categoryEN}
+                <div class="spotlight-card p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                    <h3 class="font-bold text-lg mb-6 text-blue-600 dark:text-blue-400 flex items-center z-10 relative">
+                        <i class="fa-solid fa-layer-group mr-2 opacity-70"></i>${isZh ? s.categoryZH : s.categoryEN}
                     </h3>
-                    <div class="flex flex-wrap gap-2">
-                        ${s.items.map(item => `<span class="px-3 py-1 bg-white dark:bg-slate-600 shadow-sm rounded-md text-sm font-medium dark:text-gray-200">${item}</span>`).join('')}
-                    </div>
+                    <div class="flex flex-wrap gap-2 z-10 relative">${s.items.map(item => `<span class="px-3 py-1.5 bg-gray-50 dark:bg-slate-700/50 rounded-lg text-sm font-medium dark:text-gray-200 border border-gray-100 dark:border-slate-700">${item}</span>`).join('')}</div>
                 </div>
             `).join('');
 
-            // Projects (Update: Support tagsZH/EN)
+            // Projects
             document.getElementById('project-grid').innerHTML = d.projects.map(p => {
                 const tags = isZh ? (p.tagsZH || []) : (p.tagsEN || []);
                 return `
-                <div onclick="openDrawer(${p.id})" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-xl transition overflow-hidden border border-gray-100 dark:border-slate-700 flex flex-col h-full">
-                    <div class="h-48 overflow-hidden relative bg-gray-200 dark:bg-slate-700">
-                        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold backdrop-blur-[2px]">${t.view_detail}</div>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">${isZh ? p.titleZH : p.titleEN}</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 flex-1">${isZh ? p.descZH : p.descEN}</p>
-                        <div class="mt-4 flex flex-wrap gap-2">
-                             ${tags.map(tag => `<span class="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-2 py-1 rounded">${tag}</span>`).join('')}
+                <div onclick="openDrawer(${p.id})" class="spotlight-card cursor-pointer bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1">
+                    <div class="h-56 overflow-hidden relative bg-gray-100 dark:bg-slate-700 rounded-t-2xl z-10">
+                        <img src="${p.image}" class="w-full h-full object-cover transition duration-700" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center text-white font-bold backdrop-blur-[2px]">
+                            <span class="px-4 py-2 border border-white rounded-full">${t.view_detail}</span>
                         </div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col z-10 relative">
+                        <div class="mb-3 flex justify-between items-start">
+                            <h3 class="font-bold text-xl text-gray-900 dark:text-white leading-tight">${isZh ? p.titleZH : p.titleEN}</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 flex-1 mb-6 leading-relaxed">${isZh ? p.descZH : p.descEN}</p>
+                        <div class="flex flex-wrap gap-2">${tags.map(tag => `<span class="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded-md font-medium">${tag}</span>`).join('')}</div>
                     </div>
                 </div>`;
             }).join('');
 
-            // OpenSource (Update: Support descZH/EN & roleZH/EN)
+            // OpenSource
             document.getElementById('os-list').innerHTML = d.opensource.map(os => `
-                 <a href="${os.link}" target="_blank" class="block p-6 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-600 transition border border-transparent hover:border-blue-200 group">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg group-hover:text-blue-600 dark:text-gray-200 dark:group-hover:text-blue-400"><i class="fa-solid fa-code-branch mr-2 text-sm"></i>${os.repo}</h3>
-                        <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded">${isZh ? os.roleZH : os.roleEN}</span>
+                 <a href="${os.link}" target="_blank" class="block p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 group hover:border-blue-400 dark:hover:border-blue-600 transition relative overflow-hidden">
+                    <div class="flex items-center gap-3 mb-3 relative z-10">
+                        <i class="fa-solid fa-code-branch text-gray-400 group-hover:text-blue-500 transition"></i>
+                        <h3 class="font-bold text-lg font-mono text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">${os.repo}</h3>
+                        <span class="whitespace-nowrap text-[10px] font-bold px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded border border-blue-100 dark:border-blue-800 uppercase tracking-wide">${isZh ? os.roleZH : os.roleEN}</span>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">${isZh ? os.descZH : os.descEN}</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm relative z-10 pl-7 border-l-2 border-gray-100 dark:border-slate-700 group-hover:border-blue-500 transition-colors">${isZh ? os.descZH : os.descEN}</p>
                 </a>
             `).join('');
 
             // Experience
             document.getElementById('exp-list').innerHTML = d.experience.map(e => `
-                <div class="relative">
-                    <div class="absolute -left-[41px] w-5 h-5 bg-blue-600 rounded-full border-4 border-white dark:border-slate-900 box-content"></div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">${isZh ? e.roleZH : e.roleEN}</h3>
-                    <p class="text-sm text-gray-500 mb-2">${isZh ? e.companyZH : e.companyEN} | ${e.time}</p>
-                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${isZh ? e.descZH : e.descEN}</p>
+                <div class="relative pl-10 group">
+                    <!-- 圆点 -->
+                    <div class="absolute left-[2.5px] top-2 w-2.5 h-2.5 rounded-full bg-white dark:bg-slate-900 border-2 border-blue-500 z-10 group-hover:scale-125 group-hover:bg-blue-500 transition duration-300 shadow-[0_0_0_4px_rgba(255,255,255,1)] dark:shadow-[0_0_0_4px_rgba(15,23,42,1)]"></div>
+                    
+                    <!-- 时间胶囊 -->
+                    <span class="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full mb-2 font-mono">
+                        ${isZh ? e.timeZH : e.timeEN}
+                    </span>
+
+                    <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 transition">${isZh ? e.roleZH : e.roleEN}</h3>
+                    
+                    <p class="text-sm text-gray-500 mb-3 font-medium flex items-center">
+                        <i class="fa-regular fa-building mr-2"></i> ${isZh ? e.companyZH : e.companyEN}
+                    </p>
+                    
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm bg-gray-50 dark:bg-slate-800/50 p-5 rounded-xl border border-gray-100 dark:border-slate-700/50 group-hover:border-blue-200 dark:group-hover:border-blue-900 transition">
+                        ${isZh ? e.descZH : e.descEN}
+                    </p>
                 </div>
             `).join('');
 
-            // Socials
+            // Footer Socials (增加点击事件)
             document.getElementById('social-grid').innerHTML = d.socials.map(s => `
-                <a href="${s.link}" target="_blank" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full text-2xl transition group-hover:bg-white group-hover:text-gray-900"><i class="${s.icon}"></i></div>
-                    <span class="text-xs text-gray-500 group-hover:text-white transition">${s.name}</span>
+                <a href="${s.link}" target="_blank" onclick="handleSocialClick(event, '${s.link}')" class="flex flex-col items-center gap-3 group">
+                    <div class="w-14 h-14 flex items-center justify-center bg-gray-800 rounded-2xl text-2xl transition duration-300 group-hover:bg-white group-hover:text-gray-900 group-hover:-translate-y-1"><i class="${s.icon}"></i></div>
+                    <span class="text-xs text-gray-500 group-hover:text-white transition opacity-0 group-hover:opacity-100">${s.name}</span>
                 </a>
             `).join('');
         }
@@ -209,19 +353,14 @@
             if(!p) return;
             const isZh = curLang === 'zh';
             const tags = isZh ? (p.tagsZH || []) : (p.tagsEN || []);
-            
             document.getElementById('d-img').src = p.image;
             document.getElementById('d-title').innerText = isZh ? p.titleZH : p.titleEN;
-            document.getElementById('d-tags').innerHTML = tags.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-slate-700 dark:text-gray-300 rounded text-xs">${t}</span>`).join('');
-            
+            document.getElementById('d-tags').innerHTML = tags.map(t => `<span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 dark:text-gray-300 rounded-full text-xs font-bold">${t}</span>`).join('');
             const linkBtn = document.getElementById('d-link');
             p.link ? linkBtn.classList.remove('hidden') : linkBtn.classList.add('hidden');
             linkBtn.href = p.link || '#';
-
             const rawMarkdown = isZh ? p.detailZH : p.detailEN;
-            const markdownToRender = rawMarkdown || (isZh ? '*暂无详细介绍*' : '*No details provided.*');
-            document.getElementById('d-detail').innerHTML = marked.parse(markdownToRender);
-
+            document.getElementById('d-detail').innerHTML = marked.parse(rawMarkdown || (isZh ? '*暂无详细介绍*' : '*No details provided.*'));
             const overlay = document.getElementById('drawer-overlay');
             overlay.classList.remove('hidden');
             setTimeout(() => overlay.classList.remove('opacity-0'), 0);
