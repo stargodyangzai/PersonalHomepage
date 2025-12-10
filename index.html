@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .markdown-body h3 { font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1f2937; }
+        .dark .markdown-body h3 { color: #f3f4f6; }
+        .markdown-body p { margin-bottom: 1rem; line-height: 1.7; color: #4b5563; }
+        .dark .markdown-body p { color: #9ca3af; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .markdown-body img { border-radius: 0.5rem; margin: 1.5rem 0; border: 1px solid #e5e7eb; }
+        .dark .markdown-body img { border-color: #374151; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300">
+
+    <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm z-40 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
+            <span class="font-bold text-xl" id="nav-name">MyPortfolio</span>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex space-x-6 text-sm font-medium">
+                    <a href="#stack" class="hover:text-blue-600 t-text" data-key="nav_stack">技能</a>
+                    <a href="#projects" class="hover:text-blue-600 t-text" data-key="nav_projects">项目</a>
+                    <a href="#opensource" class="hover:text-blue-600 t-text" data-key="nav_opensource">开源</a>
+                    <a href="#experience" class="hover:text-blue-600 t-text" data-key="nav_exp">经历</a>
+                </div>
+                <div class="flex items-center gap-3 border-l pl-6 border-gray-200 dark:border-slate-700">
+                    <button onclick="toggleLang()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition text-sm font-bold">
+                        <span id="lang-btn-text">En</span>
+                    </button>
+                    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition">
+                        <i id="theme-icon" class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-20 px-4 text-center">
+        <img id="avatar" src="" class="w-32 h-32 rounded-full mx-auto shadow-lg mb-6 object-cover border-4 border-white dark:border-slate-800">
+        <h1 id="name" class="text-4xl font-bold mb-4"></h1>
+        <p id="title" class="text-xl text-blue-600 dark:text-blue-400 mb-6 font-medium"></p>
+        <p id="desc" class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"></p>
+        <div class="mt-8 flex justify-center gap-4">
+            <a href="#contact" class="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition shadow-lg t-text" data-key="hero_btn_contact">联系我</a>
+            <a id="github-btn" href="" target="_blank" class="px-6 py-2 border border-gray-300 dark:border-slate-700 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition flex items-center">
+                <i class="fa-brands fa-github mr-2"></i> <span class="t-text" data-key="hero_btn_github">GitHub</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- 1. 技术栈 -->
+    <section id="stack" class="py-16 bg-white dark:bg-slate-800 transition-colors">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_stack">技术栈</h2>
+            <div id="stack-grid" class="grid md:grid-cols-3 gap-8"></div>
+        </div>
+    </section>
+
+    <!-- 2. 项目 -->
+    <section id="projects" class="py-16 bg-gray-50 dark:bg-slate-900 transition-colors">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_projects">个人项目</h2>
+            <div id="project-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+    </section>
+
+    <!-- 3. 开源 -->
+    <section id="opensource" class="py-16 bg-white dark:bg-slate-800 transition-colors">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_opensource">开源贡献</h2>
+            <div id="os-list" class="grid md:grid-cols-2 gap-6"></div>
+        </div>
+    </section>
+
+    <!-- 4. 经历 -->
+    <section id="experience" class="py-16 bg-gray-50 dark:bg-slate-900 transition-colors">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center t-text" data-key="section_exp">工作经历</h2>
+            <div id="exp-list" class="space-y-10 border-l-2 border-gray-200 dark:border-slate-700 ml-4 pl-8 relative"></div>
+        </div>
+    </section>
+
+    <!-- 5. 社交 -->
+    <footer id="contact" class="py-20 bg-gray-900 text-white text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-8 t-text" data-key="section_contact">保持联系</h2>
+            <div id="social-grid" class="flex flex-wrap justify-center gap-6 mb-12"></div>
+            <div class="text-sm text-gray-500 border-t border-gray-800 pt-8">
+                © <span id="year"></span> <span id="footer-name"></span>. <span class="t-text" data-key="footer_rights">All Rights Reserved</span>.
+            </div>
+        </div>
+    </footer>
+
+    <!-- 抽屉 -->
+    <div id="drawer-overlay" onclick="closeDrawer()" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm"></div>
+    <div id="drawer" class="fixed top-0 right-0 h-full w-full md:w-[700px] bg-white dark:bg-slate-900 shadow-2xl z-[60] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <button onclick="closeDrawer()" class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition text-gray-600 dark:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="p-8 pb-20">
+            <div class="w-full h-64 bg-gray-200 dark:bg-slate-800 rounded-xl mb-6 overflow-hidden"><img id="d-img" src="" class="w-full h-full object-cover"></div>
+            <div class="flex flex-wrap gap-2 mb-4" id="d-tags"></div>
+            <h2 id="d-title" class="text-3xl font-bold mb-2 text-gray-900 dark:text-white"></h2>
+            <a id="d-link" href="#" target="_blank" class="text-blue-600 hover:underline mb-8 inline-flex items-center"><i class="fa-solid fa-link mr-2"></i> <span class="t-text" data-key="project_link">项目链接</span></a>
+            <div id="d-detail" class="markdown-body text-gray-700 dark:text-gray-300"></div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        let d = window.portfolioData;
+        let curLang = 'zh';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!d) return alert('Data missing!');
+            initTheme(); renderAll();
+        });
+
+        function renderAll() {
+            const isZh = curLang === 'zh';
+            const t = d.translations[curLang];
+
+            // 静态文本
+            document.querySelectorAll('.t-text').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if(t[key]) el.textContent = t[key];
+            });
+
+            // Hero
+            document.getElementById('nav-name').innerText = d.info.name;
+            document.getElementById('name').innerText = d.info.name;
+            document.getElementById('footer-name').innerText = d.info.name;
+            document.getElementById('title').innerText = isZh ? d.info.titleZH : d.info.titleEN;
+            document.getElementById('desc').innerText = isZh ? d.info.descZH : d.info.descEN;
+            document.getElementById('avatar').src = d.info.avatar;
+            document.getElementById('github-btn').href = d.info.github;
+            document.getElementById('year').innerText = new Date().getFullYear();
+
+            // Stack (Update: Support categoryZH/EN)
+            document.getElementById('stack-grid').innerHTML = d.stack.map(s => `
+                <div class="p-6 bg-gray-50 dark:bg-slate-700 rounded-xl">
+                    <h3 class="font-bold text-lg mb-4 text-blue-600 dark:text-blue-400 border-b pb-2 border-gray-200 dark:border-slate-600">
+                        ${isZh ? s.categoryZH : s.categoryEN}
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${s.items.map(item => `<span class="px-3 py-1 bg-white dark:bg-slate-600 shadow-sm rounded-md text-sm font-medium dark:text-gray-200">${item}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Projects (Update: Support tagsZH/EN)
+            document.getElementById('project-grid').innerHTML = d.projects.map(p => {
+                const tags = isZh ? (p.tagsZH || []) : (p.tagsEN || []);
+                return `
+                <div onclick="openDrawer(${p.id})" class="group cursor-pointer bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-xl transition overflow-hidden border border-gray-100 dark:border-slate-700 flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative bg-gray-200 dark:bg-slate-700">
+                        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold backdrop-blur-[2px]">${t.view_detail}</div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">${isZh ? p.titleZH : p.titleEN}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 flex-1">${isZh ? p.descZH : p.descEN}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                             ${tags.map(tag => `<span class="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-2 py-1 rounded">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // OpenSource (Update: Support descZH/EN & roleZH/EN)
+            document.getElementById('os-list').innerHTML = d.opensource.map(os => `
+                 <a href="${os.link}" target="_blank" class="block p-6 bg-gray-50 dark:bg-slate-700 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-600 transition border border-transparent hover:border-blue-200 group">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg group-hover:text-blue-600 dark:text-gray-200 dark:group-hover:text-blue-400"><i class="fa-solid fa-code-branch mr-2 text-sm"></i>${os.repo}</h3>
+                        <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded">${isZh ? os.roleZH : os.roleEN}</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">${isZh ? os.descZH : os.descEN}</p>
+                </a>
+            `).join('');
+
+            // Experience
+            document.getElementById('exp-list').innerHTML = d.experience.map(e => `
+                <div class="relative">
+                    <div class="absolute -left-[41px] w-5 h-5 bg-blue-600 rounded-full border-4 border-white dark:border-slate-900 box-content"></div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">${isZh ? e.roleZH : e.roleEN}</h3>
+                    <p class="text-sm text-gray-500 mb-2">${isZh ? e.companyZH : e.companyEN} | ${e.time}</p>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${isZh ? e.descZH : e.descEN}</p>
+                </div>
+            `).join('');
+
+            // Socials
+            document.getElementById('social-grid').innerHTML = d.socials.map(s => `
+                <a href="${s.link}" target="_blank" class="flex flex-col items-center gap-2 group">
+                    <div class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full text-2xl transition group-hover:bg-white group-hover:text-gray-900"><i class="${s.icon}"></i></div>
+                    <span class="text-xs text-gray-500 group-hover:text-white transition">${s.name}</span>
+                </a>
+            `).join('');
+        }
+
+        // Drawer
+        function openDrawer(id) {
+            const p = d.projects.find(item => item.id === id);
+            if(!p) return;
+            const isZh = curLang === 'zh';
+            const tags = isZh ? (p.tagsZH || []) : (p.tagsEN || []);
+            
+            document.getElementById('d-img').src = p.image;
+            document.getElementById('d-title').innerText = isZh ? p.titleZH : p.titleEN;
+            document.getElementById('d-tags').innerHTML = tags.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-slate-700 dark:text-gray-300 rounded text-xs">${t}</span>`).join('');
+            
+            const linkBtn = document.getElementById('d-link');
+            p.link ? linkBtn.classList.remove('hidden') : linkBtn.classList.add('hidden');
+            linkBtn.href = p.link || '#';
+
+            const rawMarkdown = isZh ? p.detailZH : p.detailEN;
+            const markdownToRender = rawMarkdown || (isZh ? '*暂无详细介绍*' : '*No details provided.*');
+            document.getElementById('d-detail').innerHTML = marked.parse(markdownToRender);
+
+            const overlay = document.getElementById('drawer-overlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 0);
+            document.getElementById('drawer').classList.remove('translate-x-full');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer').classList.add('translate-x-full');
+            const overlay = document.getElementById('drawer-overlay');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => { overlay.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
+        }
+
+        function toggleLang() {
+            curLang = curLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-btn-text').innerText = curLang === 'zh' ? 'En' : '中';
+            renderAll();
+        }
+
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
+            }
+        }
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark'); localStorage.theme = 'light';
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark'); localStorage.theme = 'dark';
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
+            }
+        }
+    </script>
+</body>
+</html>
